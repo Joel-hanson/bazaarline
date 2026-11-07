@@ -267,7 +267,9 @@ export function DepthScatter({ dots }: { dots: DepthDot[] }) {
             </ul>
           </div>
         ) : (
-          <p className="chart-hint">Hover a dot to see depth, peak date, and days to the low</p>
+          <p className="chart-hint">
+            Hover a dot for trough depth, peak date, and days to the low
+          </p>
         )}
       </div>
     </div>

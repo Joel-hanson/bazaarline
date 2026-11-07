@@ -10,9 +10,9 @@ const atkinson = Atkinson_Hyperlegible({
 });
 
 export const metadata: Metadata = {
-  title: "India’s 2026 correction vs past crashes | Bazaarline",
+  title: "India’s 2026 Nifty slide vs past crashes | Bazaarline",
   description:
-    "Live Nifty 50, Sensex, Bank Nifty and Nifty IT drawdowns compared with Covid, 2008 and other Indian market crashes — backed by Yahoo Finance daily closes.",
+    "Compare the open Nifty 50 drawdown with 2008, Covid, and other Indian slides using Yahoo Finance daily closes. Price indices only.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -22,8 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         {children}
         <footer className="site-footer">
-          Bazaarline · India equity insights from public index closes. Not
-          investment advice.
+          Bazaarline uses public index closes. This is not investment advice.
         </footer>
       </body>
     </html>

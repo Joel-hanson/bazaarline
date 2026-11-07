@@ -11,7 +11,10 @@ export function labelFall(peakDate: string, depthPct: number): string {
   }
   if (y === "2021" && m >= 9) return "2022";
   if (y === "2020" || (y === "2019" && m >= 11)) return "Covid";
-  if (y === "2008" || (y === "2007" && m >= 12) || y === "2009") {
+  if (
+    (y === "2008" || (y === "2007" && m >= 12) || y === "2009") &&
+    depthPct <= -15
+  ) {
     return "2008 crisis";
   }
   if (y === "2010" || y === "2011") return "2011";

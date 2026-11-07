@@ -409,7 +409,9 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
             })()}
           </div>
         ) : (
-          <p className="chart-hint">Hover the chart to compare each day from the peak</p>
+          <p className="chart-hint">
+            Hover to compare each crash on the same day from its record close
+          </p>
         )}
       </div>
     </div>

@@ -62,13 +62,21 @@ export function FallsTable({
               </TableCell>
               <TableCell>{formatDateLong(f.peakDate)}</TableCell>
               <TableCell>
-                {f.open ? "So far" : formatDateLong(f.lowDate)}
+                {formatDateLong(f.lowDate)}
+                {f.open ? " · so far" : ""}
               </TableCell>
               <TableCell className="tabular-nums">
-                {formatPct(f.open ? (f.nowPct ?? f.depthPct) : f.depthPct)}
+                {formatPct(f.depthPct)}
+                {f.open && f.nowPct != null ? (
+                  <span className="table-sub">
+                    {" "}
+                    now {formatPct(f.nowPct)}
+                  </span>
+                ) : null}
               </TableCell>
               <TableCell className="tabular-nums">
-                {f.open ? f.tradingDaysToNow : f.tradingDaysToLow}
+                {f.tradingDaysToLow}
+                {f.open ? ` · ${f.tradingDaysToNow} so far` : ""}
               </TableCell>
               <TableCell>{backAtRecord(f)}</TableCell>
             </TableRow>

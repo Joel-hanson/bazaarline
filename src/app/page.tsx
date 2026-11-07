@@ -24,7 +24,7 @@ export default async function Home() {
     <main className="page-shell">
       <p className="hero-brand">Bazaarline</p>
       <p className="hero-kicker">
-        India market crash perspective — live index drawdowns against history.
+        Nifty drawdowns from record closes, set beside earlier Indian slides.
       </p>
 
       {errorMessage || !data ? (

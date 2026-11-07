@@ -10,75 +10,123 @@ export function InsightArticle({ data }: { data: InsightsPayload }) {
   const s = data.headlineStats;
   const it = data.indices.find((i) => i.symbol === "^CNXIT");
   const bank = data.indices.find((i) => i.symbol === "^NSEBANK");
+  const mildCount = data.depthDots.filter((d) => d.depthPct > -15).length;
 
   return (
     <article className="article" id="insight">
       <header className="article__header">
         <p className="article__date">{formatDateLong(data.asOf)}</p>
         <h1 className="article__title">
-          India&apos;s 2026 correction compared to well-known stock market crashes
+          How India&apos;s 2026 Nifty slide compares with past crashes
         </h1>
         <p className="article__lead">
-          After a shallow-looking bounce, the Nifty 50 is only{" "}
-          {formatPct(s.belowRecordPct)} below its record close. Put next to past
-          Indian crashes, the 2026 slide was a mid-sized correction —{" "}
-          {formatPct(s.troughDepthPct)} at the trough — not a crisis. IT stocks
-          tell a harder story
-          {it ? `: Nifty IT is still ${formatPct(it.belowAthPct)} below its record` : ""}
-          . We&apos;ll keep tracking the episode here with daily Yahoo Finance
-          closes.
+          On {formatDateLong(data.asOf)} the Nifty 50 closed{" "}
+          {formatPct(s.belowRecordPct)} below its record close from{" "}
+          {formatDateLong(s.recordDate)}. The bounce makes the episode look
+          small. The trough tells more: {formatPct(s.troughDepthPct)} below that
+          same record, on {formatDateLong(s.troughDate)}.
+        </p>
+        <p className="article__lead">
+          Measured on daily closes, that trough sits with other mid-sized Indian
+          corrections, not with 2008 or Covid. Bank Nifty
+          {bank ? ` is ${formatPct(bank.belowAthPct)} below its own record` : ""}
+          , close to the Nifty. Nifty IT is still carrying a deeper scar
+          {it
+            ? `: ${formatPct(it.belowAthPct)} below its late-2024 peak`
+            : ""}
+          .
         </p>
         <p className="article__meta">
-          Data {data.source === "live" ? "live from Yahoo Finance" : "from cached snapshot"} ·
-          updated for {formatDateLong(data.asOf)}
+          {data.source === "live"
+            ? "Yahoo Finance closes, refreshed about hourly"
+            : "Cached Yahoo snapshot"}{" "}
+          · as of {formatDateLong(data.asOf)} · price indices only, no dividends
         </p>
       </header>
 
       <StatStrip data={data} />
 
       <section className="article__section">
-        <h2>How far the Nifty 50 fell below a record close</h2>
+        <h2>What a “fall” means here</h2>
         <p>
-          Each line runs from a record high to the low that followed. The blue
-          line is the open 2026 correction; greys are past slides. Seven of the{" "}
-          {s.fallsPast6} falls past 6% since 2007 also cleared 15%.
+          Start at a new record close. Follow every later close. The fall ends
+          when the index closes back at or above that record. Depth is the worst
+          close in between, as a percent under the record.
         </p>
-        <p className="article__note">Daily closes to {formatDateLong(data.asOf)}</p>
+        <ol className="fall-steps">
+          <li>
+            <span className="fall-steps__label">Record close</span>
+            <span className="fall-steps__detail">A new high close sets the peak</span>
+          </li>
+          <li>
+            <span className="fall-steps__label">Trough</span>
+            <span className="fall-steps__detail">
+              Deepest later close, as % below that record
+            </span>
+          </li>
+          <li>
+            <span className="fall-steps__label">Next record</span>
+            <span className="fall-steps__detail">
+              First close back at or above the peak ends the fall
+            </span>
+          </li>
+        </ol>
+        <p>
+          Intraday spikes do not count. Nifty printed a higher high during the 5
+          Jan 2026 session, but that day still closed below the{" "}
+          {formatDateLong(s.recordDate)} record, so the record stays put.
+        </p>
+      </section>
+
+      <section className="article__section">
+        <h2>Nifty path from each record close</h2>
+        <p>
+          Each line is one fall: trading days from the record on the x-axis,
+          percent below that record on the y-axis. Blue is the open 2026
+          episode. Grey lines are earlier slides that also reached at least 15%.
+          Of the {s.fallsPast6} Nifty falls past 6% since 2007,{" "}
+          {s.fallsPast15} also cleared 15%.
+        </p>
+        <p className="article__note">
+          Daily closes through {formatDateLong(data.asOf)}. Hover the chart to
+          read each series on the same day-from-peak.
+        </p>
         <DrawdownChart overlays={data.overlays} />
         <FallsTable falls={data.nifty.falls} />
       </section>
 
       <section className="article__section">
-        <h2>Most drops of 6% stopped well short of a crash</h2>
+        <h2>Most 6% drops never became a crash</h2>
         <p>
-          Every Nifty 50 fall from a record that reached 6% since 2007 — one dot
-          each at how deep it went before the next record.{" "}
-          {data.depthDots.filter((d) => d.depthPct > -15).length} of{" "}
-          {data.depthDots.length} stopped before −15%.
+          One dot for every Nifty fall from a record that reached 6% since 2007.
+          Height is trough depth. {mildCount} of {data.depthDots.length} stopped
+          before −15%. The open 2026 trough sits near that line, not down with
+          Covid or 2008.
         </p>
         <DepthScatter dots={data.depthDots} />
       </section>
 
       <section className="article__section">
-        <h2>Mild for the Nifty, still rough for IT</h2>
+        <h2>Mild on the Nifty, still rough for IT</h2>
         <p>
-          How far each index is below its own record now, against the lows of its
-          best-known past falls. Bank Nifty
-          {bank ? ` is ${formatPct(bank.belowAthPct)} below its record` : ""} —
-          close to the Nifty — while Nifty IT remains in a deeper drawdown from
-          its late-2024 peak.
+          Each index is measured against its own record close, not against the
+          Nifty&apos;s. That matters: Sensex and Nifty IT may still be inside
+          older open slides that began in 2024, even while we name the Nifty
+          episode “2026”. Bank Nifty
+          {bank ? ` (${formatPct(bank.belowAthPct)})` : ""} is near the Nifty;
+          IT is the outlier.
         </p>
-        <p className="article__note">Daily closes to {formatDateLong(data.asOf)}</p>
+        <p className="article__note">Daily closes through {formatDateLong(data.asOf)}</p>
         <ComparisonTable data={data} />
       </section>
 
       <section className="article__section">
-        <h2>How long Indian indices took to reclaim each record</h2>
+        <h2>How long it took to get back to the record</h2>
         <p>
-          Years from each index&apos;s record close to its first close back at or
-          above it. Prices only: with dividends reinvested, most recoveries were
-          shorter. These are the worst cases for someone who bought at the
-          record.
+          Time from each index&apos;s record close to the first later close at or
+          above it. These are price indices, so dividends are ignored. For
+          someone who bought at the record and held the index itself, this is
+          the slow case.
         </p>
         <RecoveryTable data={data} />
       </section>
@@ -87,26 +135,28 @@ export function InsightArticle({ data }: { data: InsightsPayload }) {
         <h2>About the data</h2>
         <ul>
           <li>
-            Nifty 50, Sensex, Bank Nifty and Nifty IT are price indices without
-            dividends, from daily Yahoo Finance closes (symbols ^NSEI, ^BSESN,
-            ^NSEBANK, ^CNXIT).
+            Sources are Yahoo Finance daily closes for Nifty 50 (^NSEI), Sensex
+            (^BSESN), Bank Nifty (^NSEBANK), and Nifty IT (^CNXIT).
           </li>
           <li>
-            A fall runs from a record close to the next record. Its depth is the
-            lowest close before that next record.
+            A fall runs from a record close to the next record close. Depth is
+            the lowest close in between. Intraday highs and lows are ignored.
           </li>
           <li>
-            &ldquo;2026 correction&rdquo; is our name for the open slide since
-            the Nifty&apos;s {formatDateLong(s.recordDate)} record.
+            “2026 correction” is our name for the open Nifty slide since the{" "}
+            {formatDateLong(s.recordDate)} record close. Other indices can still
+            be unfinished slides that started earlier.
           </li>
           <li>
-            History shown starts around 2007, when continuous Yahoo daily series
-            for these NSE/BSE indices become reliable — so earlier episodes such
-            as 1992 or the early 2000s are outside this view.
+            The series begins around 2007, when these Yahoo daily histories
+            become continuous enough to trust. Earlier crashes (1992, early
+            2000s) are outside the chart.
           </li>
           <li>
-            Figures refresh from Yahoo on each page load (revalidated hourly). If
-            the live feed is unreachable, a recent snapshot is shown instead.
+            On the live server, figures refresh from Yahoo about every hour. If
+            Yahoo is down, the page falls back to a recent committed snapshot.
+            The GitHub Pages build freezes whatever Yahoo returned at deploy
+            time.
           </li>
         </ul>
       </section>
