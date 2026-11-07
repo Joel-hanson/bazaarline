@@ -224,11 +224,13 @@ export function buildOverlays(
 
     return {
       id: fall.id,
-      label: fall.open ? fall.label : fall.label,
+      label: fall.label,
       color,
       points: downsampleSeries(series),
       depthPct: fall.depthPct,
       open: fall.open,
+      peakDate: fall.peakDate,
+      troughDay: fall.tradingDaysToLow,
     };
   });
 }
@@ -240,6 +242,8 @@ export function buildDepthDots(nifty: IndexSeries): DepthDot[] {
     depthPct: f.depthPct,
     open: f.open,
     year: Number(f.peakDate.slice(0, 4)),
+    peakDate: f.peakDate,
+    tradingDaysToLow: f.tradingDaysToLow,
   }));
 }
 

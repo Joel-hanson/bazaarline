@@ -41,6 +41,8 @@ export type OverlaySeries = {
   points: { day: number; pct: number }[];
   depthPct: number;
   open: boolean;
+  peakDate: string;
+  troughDay: number;
 };
 
 export type DepthDot = {
@@ -49,6 +51,8 @@ export type DepthDot = {
   depthPct: number;
   open: boolean;
   year: number;
+  peakDate: string;
+  tradingDaysToLow: number;
 };
 
 export type InsightsPayload = {
