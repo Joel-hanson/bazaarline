@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { isGithubPagesBuild } from "@/lib/site";
 import {
   buildComparisonRows,
   buildDepthDots,
@@ -84,12 +85,10 @@ async function computeInsights(): Promise<InsightsPayload> {
   }
 }
 
-/** Hourly cache — avoids refetching four Yahoo histories on every request. */
-export const getInsights = unstable_cache(
-  computeInsights,
-  ["bazaarline-insights-v2"],
-  {
-    revalidate: 3600,
-    tags: ["insights"],
-  },
-);
+/** Hourly cache on Node; static Pages builds bake a single snapshot at build time. */
+export const getInsights = isGithubPagesBuild()
+  ? computeInsights
+  : unstable_cache(computeInsights, ["bazaarline-insights-v2"], {
+      revalidate: 3600,
+      tags: ["insights"],
+    });

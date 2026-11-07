@@ -53,10 +53,13 @@ export async function fetchYahooDaily(
   const res = await fetch(url, {
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (compatible; Bazaarline/1.0; +https://localhost)",
+        "Mozilla/5.0 (compatible; Bazaarline/1.0; +https://joel-hanson.github.io/bazaarline/)",
       Accept: "application/json",
     },
-    next: { revalidate: 3600 },
+    // ISR revalidate is unsupported under `output: "export"`; cache for the build instead.
+    ...(process.env.GITHUB_PAGES === "true"
+      ? { cache: "force-cache" as const }
+      : { next: { revalidate: 3600 } }),
   });
 
   if (!res.ok) {

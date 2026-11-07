@@ -1,10 +1,14 @@
 import { InsightArticle } from "@/components/insights/insight-article";
 import { getInsights } from "@/lib/market/insights";
 import { toPublicPayload } from "@/lib/market/public-payload";
+import { isGithubPagesBuild } from "@/lib/site";
 import { connection } from "next/server";
 
 export default async function Home() {
-  await connection();
+  // Live Node deploys opt into per-request rendering; GitHub Pages is static at build time.
+  if (!isGithubPagesBuild()) {
+    await connection();
+  }
 
   let data;
   let errorMessage: string | null = null;

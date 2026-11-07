@@ -21,12 +21,24 @@ npm run dev
 
 Open [http://localhost:3847](http://localhost:3847).
 
-Production:
+Production (Node server):
 
 ```bash
 npm run build
 npm start
 ```
+
+### GitHub Pages
+
+Live site: [https://joel-hanson.github.io/bazaarline/](https://joel-hanson.github.io/bazaarline/)
+
+Static export (same path as the repo name):
+
+```bash
+npm run build:pages
+```
+
+`.github/workflows/deploy-github-pages.yml` builds and deploys on every push to `main`. Insights are baked at build time (Yahoo when reachable, otherwise the committed fallback snapshots). The JSON feed is available at `/bazaarline/api/insights` on Pages.
 
 ## Market data refresh
 
@@ -38,7 +50,7 @@ npm run update-data
 
 ### GitHub Actions (weekly)
 
-`.github/workflows/update-market-data.yml` runs every Monday at 02:30 UTC (`workflow_dispatch` also works). It fetches Yahoo closes, commits any changes to the snapshot JSON, and pushes to `main`.
+`.github/workflows/update-market-data.yml` runs every Monday at 02:30 UTC (`workflow_dispatch` also works). It fetches Yahoo closes, commits any changes to the snapshot JSON, and pushes to `main` — which also retriggers the Pages deploy.
 
 ## Data notes
 
