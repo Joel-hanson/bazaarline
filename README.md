@@ -30,7 +30,7 @@ npm start
 
 ### GitHub Pages
 
-Live site: [https://joel-hanson.github.io/bazaarline/](https://joel-hanson.github.io/bazaarline/)
+Live site: [https://joelhanson.com/bazaarline/](https://joelhanson.com/bazaarline/)
 
 Static export (same path as the repo name):
 
