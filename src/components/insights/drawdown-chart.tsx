@@ -331,7 +331,7 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
                   cx={x(last.day)}
                   cy={y(last.pct)}
                   r={emphasized ? 3.6 : 2.4}
-                  fill="#fff"
+                  fill="var(--bg-deep)"
                   stroke="currentColor"
                   strokeWidth={emphasized ? 2.2 : 1.6}
                 />
@@ -355,7 +355,7 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
                   cy={y(row.pct)}
                   r={row.id === hover.focusId ? 5 : 3.5}
                   fill={row.color}
-                  stroke="#fff"
+                  stroke="var(--bg-deep)"
                   strokeWidth={1.5}
                   opacity={
                     focusId == null || focusId === row.id ? 1 : 0.25

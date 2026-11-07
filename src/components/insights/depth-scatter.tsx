@@ -38,9 +38,9 @@ function beeswarmX(
 
 function dotFill(d: DepthDot): string {
   if (d.open) return "var(--chart-now)";
-  if (d.depthPct <= -30) return "#334155";
-  if (d.depthPct <= -15) return "#64748B";
-  return "#CBD5E1";
+  if (d.depthPct <= -30) return "#E5E5E5";
+  if (d.depthPct <= -15) return "#A3A3A3";
+  return "#525252";
 }
 
 type HoverDot = {

@@ -151,9 +151,9 @@ export function buildIndexSeries(
   };
 }
 
-/** Current episode first (vivid), then historical greys — Kadoa/FT crash-overlay palette. */
-const CURRENT_COLOR = "#0B6BCB";
-const PAST_COLORS = ["#94A3B8", "#64748B", "#475569", "#334155", "#0F172A", "#78716C"];
+/** Current episode in portfolio crimson; past slides in terminal greys. */
+const CURRENT_COLOR = "#DC143C";
+const PAST_COLORS = ["#A3A3A3", "#737373", "#D4D4D4", "#525252", "#E5E5E5", "#8A8A8A"];
 
 function downsampleSeries(
   points: { day: number; pct: number }[],

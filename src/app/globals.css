@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
-  --font-mono: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
-  --font-heading: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,42 +48,50 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Matches joelhanson.com joel-terminal / PlanetScale dark theme */
 :root {
-  --ink: #111111;
-  --ink-soft: #444444;
-  --chart-now: #0b6bcb;
-  --background: #ffffff;
-  --foreground: #111111;
-  --card: #ffffff;
-  --card-foreground: #111111;
-  --popover: #ffffff;
-  --popover-foreground: #111111;
-  --primary: #0b6bcb;
-  --primary-foreground: #ffffff;
-  --secondary: #f5f5f5;
-  --secondary-foreground: #111111;
-  --muted: #f5f5f5;
-  --muted-foreground: #666666;
-  --accent: #f5f5f5;
-  --accent-foreground: #111111;
-  --destructive: #b42318;
-  --border: rgba(0, 0, 0, 0.12);
-  --input: rgba(0, 0, 0, 0.12);
-  --ring: #0b6bcb;
-  --chart-1: #0b6bcb;
-  --chart-2: #888888;
-  --chart-3: #555555;
-  --chart-4: #aaaaaa;
-  --chart-5: #222222;
-  --radius: 0.25rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #111111;
-  --sidebar-primary: #0b6bcb;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #111111;
-  --sidebar-border: rgba(0, 0, 0, 0.12);
-  --sidebar-ring: #0b6bcb;
+  --bg-deep: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-elevated: #1a1a1a;
+  --ink: #fafafa;
+  --ink-soft: #d4d4d4;
+  --ink-muted: #a3a3a3;
+  --line: #262626;
+  --line-strong: #404040;
+  --chart-now: #dc143c;
+  --accent: #dc143c;
+  --accent-text: #f25c5c;
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #111111;
+  --card-foreground: #fafafa;
+  --popover: #111111;
+  --popover-foreground: #fafafa;
+  --primary: #dc143c;
+  --primary-foreground: #fafafa;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #fafafa;
+  --muted: #1a1a1a;
+  --muted-foreground: #a3a3a3;
+  --accent-foreground: #fafafa;
+  --destructive: #ef4444;
+  --border: #262626;
+  --input: #262626;
+  --ring: #dc143c;
+  --chart-1: #dc143c;
+  --chart-2: #a3a3a3;
+  --chart-3: #737373;
+  --chart-4: #d4d4d4;
+  --chart-5: #e5e5e5;
+  --radius: 0.375rem;
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #dc143c;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #262626;
+  --sidebar-ring: #dc143c;
 }
 
 @layer base {
@@ -100,17 +108,19 @@
 
 body {
   min-height: 100vh;
-  background: #ffffff;
+  background: var(--bg-deep);
   color: var(--ink);
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-size: 15px;
+  letter-spacing: -0.02em;
 }
 
 .site-header {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: #ffffff;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, var(--bg-deep) 92%, transparent);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(10px);
 }
 
 .site-header__inner {
@@ -135,12 +145,12 @@ body {
   width: 0.65rem;
   height: 0.65rem;
   border-radius: 2px;
-  background: var(--chart-now);
+  background: var(--accent);
 }
 
 .brand__name {
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
-  font-size: 1.35rem;
+  font-family: var(--font-sans);
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -148,9 +158,11 @@ body {
 
 .site-nav {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 1.1rem;
   font-size: 0.92rem;
-  color: var(--ink-soft);
+  color: var(--ink-muted);
 }
 
 .site-nav a {
@@ -159,7 +171,7 @@ body {
 }
 
 .site-nav a:hover {
-  color: var(--chart-now);
+  color: var(--accent-text);
 }
 
 .page-shell {
@@ -167,12 +179,12 @@ body {
   max-width: 920px;
   margin: 0 auto;
   padding: 1.25rem 1.25rem 4rem;
-  background: #ffffff;
+  background: transparent;
 }
 
 .hero-brand {
   margin: 0.75rem 0 0.2rem;
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(2.2rem, 5.5vw, 3.4rem);
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -194,12 +206,12 @@ body {
 
 .article__date {
   font-size: 0.92rem;
-  color: var(--ink-soft);
+  color: var(--ink-muted);
   margin-bottom: 0.5rem;
 }
 
 .article__title {
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.65rem, 4vw, 2.25rem);
   font-weight: 700;
   letter-spacing: -0.025em;
@@ -215,10 +227,14 @@ body {
   margin: 0;
 }
 
+.article__lead + .article__lead {
+  margin-top: 0.75rem;
+}
+
 .article__meta {
   margin-top: 0.7rem;
   font-size: 0.86rem;
-  color: #666666;
+  color: var(--ink-muted);
 }
 
 .article__section {
@@ -226,7 +242,7 @@ body {
 }
 
 .article__section h2 {
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.25rem, 2.5vw, 1.5rem);
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -242,7 +258,7 @@ body {
 
 .article__note {
   font-size: 0.86rem !important;
-  color: #666666 !important;
+  color: var(--ink-muted) !important;
 }
 
 .fall-steps {
@@ -251,8 +267,8 @@ body {
   padding: 0;
   display: grid;
   gap: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 @media (min-width: 720px) {
@@ -263,14 +279,14 @@ body {
 
 .fall-steps li {
   padding: 0.85rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--line);
 }
 
 @media (min-width: 720px) {
   .fall-steps li {
     padding: 0.9rem 1rem 0.9rem 0;
     border-bottom: none;
-    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    border-right: 1px solid var(--line);
   }
 
   .fall-steps li:last-child {
@@ -306,9 +322,9 @@ body {
 .stat-strip {
   margin-top: 1.4rem;
   padding: 1rem 0 0.15rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  background: #ffffff;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: transparent;
 }
 
 .stat-strip__eyebrow {
@@ -330,19 +346,19 @@ body {
   }
 
   .stat-strip__item + .stat-strip__item {
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 1px solid var(--line);
     padding-left: 1rem;
   }
 }
 
 .stat-strip__label {
   font-size: 0.78rem;
-  color: #666666;
+  color: var(--ink-muted);
   margin: 0 0 0.25rem;
 }
 
 .stat-strip__value {
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.45rem, 2.6vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -363,7 +379,7 @@ body {
   margin: 0.25rem 0 1rem;
   padding: 0;
   border: none;
-  background: #ffffff;
+  background: transparent;
 }
 
 .chart-frame--bleed {
@@ -387,53 +403,55 @@ body {
   display: block;
   min-width: 640px;
   background:
-    linear-gradient(180deg, #fafbfc 0%, #ffffff 42%, #ffffff 100%);
+    linear-gradient(180deg, #111111 0%, #0a0a0a 55%, #0a0a0a 100%);
   touch-action: none;
   cursor: crosshair;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
 }
 
 .chart-grid {
-  stroke: rgba(0, 0, 0, 0.08);
+  stroke: rgba(255, 255, 255, 0.08);
   stroke-width: 1;
 }
 
 .chart-grid--emphasis {
-  stroke: rgba(11, 107, 203, 0.28);
+  stroke: rgba(220, 20, 60, 0.45);
   stroke-width: 1.25;
 }
 
 .chart-axis {
-  stroke: rgba(0, 0, 0, 0.28);
+  stroke: rgba(255, 255, 255, 0.28);
   stroke-width: 1;
 }
 
 .chart-tick {
-  fill: #666666;
+  fill: #a3a3a3;
   font-size: 12px;
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-mono);
 }
 
 .chart-tick--emphasis {
-  fill: var(--chart-now);
+  fill: var(--accent-text);
   font-weight: 700;
 }
 
 .chart-axis-label {
-  fill: #666666;
+  fill: #a3a3a3;
   font-size: 12px;
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-mono);
 }
 
 .chart-ref-label {
-  fill: #0b6bcb;
+  fill: var(--accent-text);
   font-size: 11px;
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-mono);
   letter-spacing: 0.01em;
 }
 
 .chart-end-label {
   font-size: 12px;
-  font-family: var(--font-sans), "Atkinson Hyperlegible", Arial, sans-serif;
+  font-family: var(--font-mono);
   font-weight: 400;
 }
 
@@ -455,13 +473,13 @@ body {
 }
 
 .chart-crosshair__line {
-  stroke: rgba(17, 17, 17, 0.35);
+  stroke: rgba(250, 250, 250, 0.35);
   stroke-width: 1;
   stroke-dasharray: 3 4;
 }
 
 .chart-crosshair__line--soft {
-  stroke: rgba(17, 17, 17, 0.18);
+  stroke: rgba(250, 250, 250, 0.18);
 }
 
 .chart-dot {
@@ -484,8 +502,8 @@ body {
 
 .chart-legend__item {
   appearance: none;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: #fff;
+  border: 1px solid var(--line);
+  background: var(--bg-surface);
   color: var(--ink);
   border-radius: 999px;
   padding: 0.28rem 0.7rem 0.28rem 0.45rem;
@@ -505,12 +523,12 @@ body {
 
 .chart-legend__item:hover,
 .chart-legend__item.is-active {
-  border-color: color-mix(in srgb, var(--swatch) 55%, #111111);
-  background: color-mix(in srgb, var(--swatch) 10%, #ffffff);
+  border-color: color-mix(in srgb, var(--swatch) 55%, #fafafa);
+  background: color-mix(in srgb, var(--swatch) 14%, var(--bg-surface));
 }
 
 .chart-legend__item.is-current {
-  border-color: color-mix(in srgb, var(--chart-now) 45%, transparent);
+  border-color: color-mix(in srgb, var(--chart-now) 55%, transparent);
 }
 
 .chart-legend__item.is-dimmed {
@@ -531,7 +549,7 @@ body {
 }
 
 .chart-legend__meta {
-  color: #666666;
+  color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -540,11 +558,11 @@ body {
   flex-wrap: wrap;
   gap: 0.85rem 1.25rem;
   font-size: 0.82rem;
-  color: #666666;
+  color: var(--ink-muted);
 }
 
 .chart-legend-inline__note {
-  color: var(--chart-now);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -561,10 +579,10 @@ body {
   background: var(--chart-now);
 }
 .dot--past {
-  background: #94a3b8;
+  background: #a3a3a3;
 }
 .dot--deep {
-  background: #334155;
+  background: #e5e5e5;
 }
 
 .chart-tooltip {
@@ -573,11 +591,11 @@ body {
   min-width: 12.5rem;
   max-width: min(18rem, 78%);
   padding: 0.7rem 0.8rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--line-strong);
   border-radius: 0.55rem;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--bg-elevated) 94%, transparent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
   pointer-events: none;
   transform: translateY(-8px);
   animation: chart-tooltip-in 140ms ease-out;
@@ -599,7 +617,7 @@ body {
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: #444444;
+  color: var(--ink-muted);
   text-transform: uppercase;
 }
 
@@ -617,7 +635,7 @@ body {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.84rem;
-  color: #555555;
+  color: var(--ink-soft);
 }
 
 .chart-tooltip__row.is-focus {
@@ -646,33 +664,33 @@ body {
 .chart-tooltip__note {
   margin: 0.55rem 0 0;
   padding-top: 0.45rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--line);
   font-size: 0.76rem;
-  color: #666666;
+  color: var(--ink-muted);
   line-height: 1.35;
 }
 
 .chart-hint {
   margin: 0.35rem 0 0;
   font-size: 0.8rem;
-  color: #888888;
+  color: var(--ink-muted);
 }
 
 .table-sub {
   display: block;
   font-size: 0.78rem;
   font-weight: 400;
-  color: #666666;
+  color: var(--ink-muted);
   margin-top: 0.15rem;
 }
 
 .table-scroll {
   width: 100%;
   overflow-x: auto;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   border-radius: 0;
-  background: #ffffff;
+  background: transparent;
 }
 
 .table-scroll [data-slot="table-container"] {
@@ -681,7 +699,7 @@ body {
 
 .table-scroll table {
   min-width: 720px;
-  background: #ffffff;
+  background: transparent;
 }
 
 .table-scroll th {
@@ -689,28 +707,29 @@ body {
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
-  color: #666666;
-  background: #ffffff;
+  color: var(--ink-muted);
+  background: transparent;
 }
 
 .table-scroll td,
 .table-scroll th {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
-  background: #ffffff;
+  background: transparent;
+  border-color: var(--line);
 }
 
 .table-scroll tbody tr {
-  background: #ffffff;
+  background: transparent;
 }
 
 .table-scroll tbody tr:hover {
-  background: #ffffff !important;
+  background: var(--bg-elevated) !important;
 }
 
 .row-current,
 .row-current td {
-  background: #f3f8fd !important;
+  background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
 }
 
 .text-muted-copy {
@@ -734,9 +753,24 @@ body {
   max-width: 920px;
   margin: 0 auto;
   padding: 0 1.25rem 2.5rem;
-  color: #666666;
+  color: var(--ink-muted);
   font-size: 0.86rem;
-  background: #ffffff;
+  background: transparent;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.site-footer a {
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .tabular-nums {

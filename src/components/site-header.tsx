@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PORTFOLIO_URL } from "@/lib/analytics";
 
 export function SiteHeader() {
   return (
@@ -11,6 +12,7 @@ export function SiteHeader() {
         <nav className="site-nav" aria-label="Primary">
           <a href="#insight">Insight</a>
           <a href="#about-data">Data</a>
+          <a href={PORTFOLIO_URL}>Joel Hanson</a>
         </nav>
       </div>
     </header>
