@@ -10,6 +10,7 @@ export function InsightArticle({ data }: { data: InsightsPayload }) {
   const s = data.headlineStats;
   const it = data.indices.find((i) => i.symbol === "^CNXIT");
   const bank = data.indices.find((i) => i.symbol === "^NSEBANK");
+  const value20 = data.indices.find((i) => i.symbol === "NV20.NS");
   const mildCount = data.depthDots.filter((d) => d.depthPct > -15).length;
 
   return (
@@ -114,7 +115,9 @@ export function InsightArticle({ data }: { data: InsightsPayload }) {
           older open slides that began in 2024, even while we name the Nifty
           episode “2026”. Bank Nifty
           {bank ? ` (${formatPct(bank.belowAthPct)})` : ""} is near the Nifty;
-          IT is the outlier.
+          Nifty 50 Value 20
+          {value20 ? ` is ${formatPct(value20.belowAthPct)} below its record` : ""}
+          ; IT is the outlier.
         </p>
         <p className="article__note">Daily closes through {formatDateLong(data.asOf)}</p>
         <ComparisonTable data={data} />
@@ -136,7 +139,8 @@ export function InsightArticle({ data }: { data: InsightsPayload }) {
         <ul>
           <li>
             Sources are Yahoo Finance daily closes for Nifty 50 (^NSEI), Sensex
-            (^BSESN), Bank Nifty (^NSEBANK), and Nifty IT (^CNXIT).
+            (^BSESN), Bank Nifty (^NSEBANK), Nifty IT (^CNXIT), and Nifty 50
+            Value 20 (NV20.NS).
           </li>
           <li>
             A fall runs from a record close to the next record close. Depth is
@@ -148,9 +152,15 @@ export function InsightArticle({ data }: { data: InsightsPayload }) {
             be unfinished slides that started earlier.
           </li>
           <li>
-            The series begins around 2007, when these Yahoo daily histories
-            become continuous enough to trust. Earlier crashes (1992, early
-            2000s) are outside the chart.
+            Value 20 history on Yahoo starts in late 2015, so earlier crash rows
+            show as blank for that column. NV20.NS is the Kotak NV20 ETF price
+            series that tracks the index; an unmarked Feb 2026 unit split is
+            rebased before drawdowns are computed.
+          </li>
+          <li>
+            The broad-index series begin around 2007, when these Yahoo daily
+            histories become continuous enough to trust. Earlier crashes (1992,
+            early 2000s) are outside the chart.
           </li>
           <li>
             On the live server, figures refresh from Yahoo about every hour. If

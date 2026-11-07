@@ -12,7 +12,13 @@ import { FALLBACK_SERIES } from "./fallback";
 import type { InsightsPayload, PricePoint } from "./types";
 import { fetchYahooDaily, type YahooSymbol } from "./yahoo";
 
-const SYMBOLS: YahooSymbol[] = ["^NSEI", "^BSESN", "^NSEBANK", "^CNXIT"];
+const SYMBOLS: YahooSymbol[] = [
+  "^NSEI",
+  "^BSESN",
+  "^NSEBANK",
+  "^CNXIT",
+  "NV20.NS",
+];
 
 async function loadLive(): Promise<{
   series: { symbol: YahooSymbol; currency: string; points: PricePoint[] }[];
@@ -88,7 +94,7 @@ async function computeInsights(): Promise<InsightsPayload> {
 /** Hourly cache on Node; static Pages builds bake a single snapshot at build time. */
 export const getInsights = isGithubPagesBuild()
   ? computeInsights
-  : unstable_cache(computeInsights, ["bazaarline-insights-v2"], {
+  : unstable_cache(computeInsights, ["bazaarline-insights-v3"], {
       revalidate: 3600,
       tags: ["insights"],
     });

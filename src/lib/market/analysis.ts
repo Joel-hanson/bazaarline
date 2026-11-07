@@ -314,6 +314,7 @@ export function buildRecoveryRows(indices: IndexSeries[]) {
   const sensex = byName["^BSESN"];
   const bank = byName["^NSEBANK"];
   const it = byName["^CNXIT"];
+  const value20 = byName["NV20.NS"];
 
   const episodes: { crash: string; test: (f: FallEpisode) => boolean }[] = [
     {
@@ -354,5 +355,8 @@ export function buildRecoveryRows(indices: IndexSeries[]) {
     sensex: recoveryCell(matchFall(sensex, test)),
     bankNifty: recoveryCell(matchFall(bank, test)),
     niftyIt: recoveryCell(matchFall(it, test)),
+    niftyValue20: recoveryCell(
+      value20 ? matchFall(value20, test) : undefined,
+    ),
   }));
 }

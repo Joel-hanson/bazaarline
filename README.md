@@ -54,7 +54,7 @@ npm run update-data
 
 ## Data notes
 
-- Sources: Yahoo Finance chart API for `^NSEI`, `^BSESN`, `^NSEBANK`, `^CNXIT`
+- Sources: Yahoo Finance chart API for `^NSEI`, `^BSESN`, `^NSEBANK`, `^CNXIT`, `NV20.NS`
 - Price indices only (no dividends)
 - A “fall” is measured from a record close to the next record; depth is the lowest close in between
 - Live pages revalidate about every hour; weekly Actions keep the committed fallback current

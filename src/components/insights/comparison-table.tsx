@@ -44,6 +44,7 @@ export function RecoveryTable({ data }: { data: InsightsPayload }) {
             <TableHead>Sensex</TableHead>
             <TableHead>Bank Nifty</TableHead>
             <TableHead>Nifty IT</TableHead>
+            <TableHead>Value 20</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,6 +55,7 @@ export function RecoveryTable({ data }: { data: InsightsPayload }) {
               <TableCell className="tabular-nums">{row.sensex}</TableCell>
               <TableCell className="tabular-nums">{row.bankNifty}</TableCell>
               <TableCell className="tabular-nums">{row.niftyIt}</TableCell>
+              <TableCell className="tabular-nums">{row.niftyValue20}</TableCell>
             </TableRow>
           ))}
         </TableBody>

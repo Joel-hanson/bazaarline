@@ -86,5 +86,6 @@ export type InsightsPayload = {
     sensex: string;
     bankNifty: string;
     niftyIt: string;
+    niftyValue20: string;
   }[];
 };

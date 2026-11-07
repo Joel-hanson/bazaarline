@@ -17,7 +17,35 @@ const SERIES = [
   { file: "BSESN.json", symbol: "^BSESN" },
   { file: "NSEBANK.json", symbol: "^NSEBANK" },
   { file: "CNXIT.json", symbol: "^CNXIT" },
+  { file: "NV20.json", symbol: "NV20.NS" },
 ];
+
+/** Rebase unmarked ETF unit splits (e.g. NV20.NS ~10:1 in Feb 2026). */
+function adjustObviousUnitSplits(points) {
+  if (points.length < 2) return points;
+  const out = points.map((p) => ({ ...p }));
+  for (let i = 1; i < out.length; i++) {
+    const prev = out[i - 1].close;
+    const cur = out[i].close;
+    if (!(prev > 0 && cur > 0)) continue;
+    const ratio = cur / prev;
+    for (const factor of [10, 5, 2]) {
+      if (ratio > 1 / (factor * 1.2) && ratio < 1 / (factor * 0.8)) {
+        for (let j = i; j < out.length; j++) {
+          out[j].close = Number((out[j].close * factor).toFixed(4));
+        }
+        break;
+      }
+      if (ratio > factor * 0.8 && ratio < factor * 1.2) {
+        for (let j = i; j < out.length; j++) {
+          out[j].close = Number((out[j].close / factor).toFixed(4));
+        }
+        break;
+      }
+    }
+  }
+  return out;
+}
 
 const YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart";
 const YEARS_BACK = 20;
@@ -66,11 +94,14 @@ async function fetchSymbol(symbol) {
     throw new Error(`${symbol}: too few points (${points.length})`);
   }
 
+  const adjusted =
+    symbol === "NV20.NS" ? adjustObviousUnitSplits(points) : points;
+
   return {
     symbol,
     currency: result.meta?.currency ?? "INR",
     updatedAt: new Date().toISOString(),
-    points,
+    points: adjusted,
   };
 }
 
