@@ -31,14 +31,15 @@ type YahooChartResponse = {
   };
 };
 
+const istDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Kolkata",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 function toDateIST(unixSeconds: number): string {
-  // NSE timestamps are IST market close; format as calendar date in Asia/Kolkata
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(unixSeconds * 1000));
+  return istDateFormatter.format(new Date(unixSeconds * 1000));
 }
 
 export async function fetchYahooDaily(

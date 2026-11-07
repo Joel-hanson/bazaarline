@@ -147,15 +147,28 @@ export function buildIndexSeries(
   };
 }
 
-const OVERLAY_COLORS = [
-  "#0A7A6A", // current — teal
-  "#C45C26", // covid-ish terracotta avoided? use rust carefully - use slate coral
-  "#1F4B7A",
-  "#8B3A4A",
-  "#5B6B2F",
-  "#6B4C9A",
-  "#2F5D50",
-];
+/** Current episode first (vivid), then historical greys — Kadoa/FT crash-overlay palette. */
+const CURRENT_COLOR = "#0B6BCB";
+const PAST_COLORS = ["#94A3B8", "#64748B", "#475569", "#334155", "#0F172A", "#78716C"];
+
+function downsampleSeries(
+  points: { day: number; pct: number }[],
+  maxPoints = 160,
+): { day: number; pct: number }[] {
+  if (points.length <= maxPoints) return points;
+  const step = Math.ceil(points.length / maxPoints);
+  let trough = points[0];
+  const out: { day: number; pct: number }[] = [];
+  for (let i = 0; i < points.length; i++) {
+    if (points[i].pct < trough.pct) trough = points[i];
+    if (i % step === 0 || i === points.length - 1) out.push(points[i]);
+  }
+  if (!out.some((p) => p.day === trough.day)) {
+    out.push(trough);
+    out.sort((a, b) => a.day - b.day);
+  }
+  return out;
+}
 
 export function buildOverlays(
   nifty: IndexSeries,
@@ -166,10 +179,8 @@ export function buildOverlays(
     .sort((a, b) => {
       if (a.open !== b.open) return a.open ? -1 : 1;
       return a.depthPct - b.depthPct;
-    })
-    .slice(0, maxSeries);
+    });
 
-  // Prefer showing open + deepest historical
   const ordered = [
     ...candidates.filter((f) => f.open),
     ...candidates
@@ -177,33 +188,41 @@ export function buildOverlays(
       .sort((a, b) => a.depthPct - b.depthPct),
   ].slice(0, maxSeries);
 
-  return ordered.map((fall, idx) => {
-    const startIdx = nifty.points.findIndex((p) => p.date === fall.peakDate);
-    const endIdx = fall.open
+  const indexByDate = new Map<string, number>();
+  nifty.points.forEach((p, i) => indexByDate.set(p.date, i));
+
+  let pastIdx = 0;
+  return ordered.map((fall) => {
+    const startIdx = indexByDate.get(fall.peakDate) ?? 0;
+    let endIdx = fall.open
       ? nifty.points.length - 1
-      : nifty.points.findIndex((p) => p.date === fall.recoveredDate) >= 0
-        ? nifty.points.findIndex((p) => p.date === fall.recoveredDate)
-        : nifty.points.findIndex((p) => p.date === fall.lowDate);
+      : (indexByDate.get(fall.recoveredDate ?? "") ?? -1);
+    if (endIdx < 0) {
+      endIdx = indexByDate.get(fall.lowDate) ?? startIdx;
+    }
 
     const peak = fall.peak;
     const series: { day: number; pct: number }[] = [];
     let day = 0;
     const limit = Math.min(endIdx, startIdx + 450);
     for (let i = startIdx; i <= limit; i++) {
-      const pct = Number((((nifty.points[i].close / peak - 1) * 100)).toFixed(2));
+      const pct = Number(((nifty.points[i].close / peak - 1) * 100).toFixed(2));
       series.push({ day, pct });
       day += 1;
-      // stop a bit after trough for closed falls once recovered near peak
       if (!fall.open && i > startIdx + fall.tradingDaysToLow + 30 && pct > -1) {
         break;
       }
     }
 
+    const color = fall.open
+      ? CURRENT_COLOR
+      : PAST_COLORS[pastIdx++ % PAST_COLORS.length];
+
     return {
       id: fall.id,
-      label: fall.open ? `${fall.label} (now)` : fall.label,
-      color: OVERLAY_COLORS[idx % OVERLAY_COLORS.length],
-      points: series,
+      label: fall.open ? fall.label : fall.label,
+      color,
+      points: downsampleSeries(series),
       depthPct: fall.depthPct,
       open: fall.open,
     };

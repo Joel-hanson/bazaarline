@@ -40,8 +40,8 @@ export function InsightArticle({ data }: { data: InsightsPayload }) {
         <h2>How far the Nifty 50 fell below a record close</h2>
         <p>
           Each line runs from a record high toward the low that followed. The
-          teal line is the open 2026 correction. Seven of the{" "}
-          {s.fallsPast6} falls past 6% since 2007 also cleared 15%.
+          blue line is the open 2026 correction; greys are past slides. Seven of
+          the {s.fallsPast6} falls past 6% since 2007 also cleared 15%.
         </p>
         <p className="article__note">Daily closes to {formatDateLong(data.asOf)}</p>
         <DrawdownChart overlays={data.overlays} />

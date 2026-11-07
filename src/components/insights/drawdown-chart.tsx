@@ -1,96 +1,141 @@
-"use client";
-
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import type { OverlaySeries } from "@/lib/market/types";
 
-function mergeOverlayData(overlays: OverlaySeries[]) {
-  const maxDay = Math.max(0, ...overlays.flatMap((o) => o.points.map((p) => p.day)));
-  const rows: Record<string, number | undefined>[] = [];
-  for (let day = 0; day <= Math.min(maxDay, 400); day++) {
-    const row: Record<string, number | undefined> = { day };
-    for (const o of overlays) {
-      const pt = o.points.find((p) => p.day === day);
-      if (pt) row[o.id] = pt.pct;
-    }
-    rows.push(row);
+const WIDTH = 920;
+const HEIGHT = 420;
+const PAD = { top: 28, right: 168, bottom: 48, left: 48 };
+
+function downsample(
+  points: { day: number; pct: number }[],
+  maxPoints = 180,
+): { day: number; pct: number }[] {
+  if (points.length <= maxPoints) return points;
+  const step = Math.ceil(points.length / maxPoints);
+  const out: { day: number; pct: number }[] = [];
+  let trough = points[0];
+  for (let i = 0; i < points.length; i++) {
+    if (points[i].pct < trough.pct) trough = points[i];
+    if (i % step === 0 || i === points.length - 1) out.push(points[i]);
   }
-  return rows;
+  if (!out.some((p) => p.day === trough.day && p.pct === trough.pct)) {
+    out.push(trough);
+    out.sort((a, b) => a.day - b.day);
+  }
+  return out;
+}
+
+function niceTicks(min: number, max: number, count = 5): number[] {
+  const span = max - min || 1;
+  const step = Math.ceil(span / (count - 1) / 5) * 5;
+  const start = Math.floor(min / step) * step;
+  const ticks: number[] = [];
+  for (let v = start; v <= max + 0.01; v += step) ticks.push(v);
+  return ticks;
 }
 
 export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
-  const data = mergeOverlayData(overlays);
+  const series = overlays.map((o) => ({
+    ...o,
+    points: downsample(o.points),
+  }));
+
+  const maxDay = Math.max(1, ...series.flatMap((s) => s.points.map((p) => p.day)));
+  const minPct = Math.min(-5, ...series.flatMap((s) => s.points.map((p) => p.pct)));
+  const maxPct = 2;
+  const innerW = WIDTH - PAD.left - PAD.right;
+  const innerH = HEIGHT - PAD.top - PAD.bottom;
+
+  const x = (day: number) => PAD.left + (day / maxDay) * innerW;
+  const y = (pct: number) =>
+    PAD.top + ((maxPct - pct) / (maxPct - minPct)) * innerH;
+
+  const yTicks = niceTicks(minPct, maxPct, 6);
+  const xTicks = [0, Math.round(maxDay / 4), Math.round(maxDay / 2), Math.round((3 * maxDay) / 4), maxDay];
+
+  // Draw historical first, current last (on top)
+  const ordered = [
+    ...series.filter((s) => !s.open),
+    ...series.filter((s) => s.open),
+  ];
 
   return (
-    <div className="chart-frame">
-      <ResponsiveContainer width="100%" height={360}>
-        <LineChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
-          <CartesianGrid stroke="rgba(15, 40, 48, 0.08)" vertical={false} />
-          <XAxis
-            dataKey="day"
-            tickLine={false}
-            axisLine={false}
-            tick={{ fill: "#5A6B72", fontSize: 12 }}
-            label={{
-              value: "Trading days from record close",
-              position: "insideBottom",
-              offset: -2,
-              fill: "#5A6B72",
-              fontSize: 12,
-            }}
-          />
-          <YAxis
-            tickLine={false}
-            axisLine={false}
-            tick={{ fill: "#5A6B72", fontSize: 12 }}
-            tickFormatter={(v: number) => `${v}%`}
-            domain={["auto", 2]}
-          />
-          <Tooltip
-            contentStyle={{
-              background: "#F4F8F7",
-              border: "1px solid rgba(15,40,48,0.12)",
-              borderRadius: 8,
-              fontSize: 13,
-            }}
-            formatter={(value, name) => {
-              const series = overlays.find((o) => o.id === name);
-              const num = typeof value === "number" ? value : Number(value);
-              return [
-                `${Number.isFinite(num) ? num.toFixed(1) : value}%`,
-                series?.label ?? String(name),
-              ];
-            }}
-            labelFormatter={(label) => `Day ${label}`}
-          />
-          <Legend
-            wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
-            formatter={(value) => overlays.find((o) => o.id === value)?.label ?? value}
-          />
-          {overlays.map((o) => (
-            <Line
-              key={o.id}
-              type="monotone"
-              dataKey={o.id}
-              stroke={o.color}
-              strokeWidth={o.open ? 2.75 : 1.6}
-              strokeOpacity={o.open ? 1 : 0.85}
-              dot={false}
-              isAnimationActive
-              animationDuration={900}
-              connectNulls={false}
+    <div className="chart-frame chart-frame--bleed">
+      <svg
+        className="chart-svg"
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        role="img"
+        aria-label="Nifty 50 drawdowns from record closes, compared across crashes"
+      >
+        {/* grid */}
+        {yTicks.map((tick) => (
+          <g key={`y-${tick}`}>
+            <line
+              x1={PAD.left}
+              x2={PAD.left + innerW}
+              y1={y(tick)}
+              y2={y(tick)}
+              className={tick === 0 ? "chart-axis" : "chart-grid"}
             />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
+            <text x={PAD.left - 10} y={y(tick) + 4} textAnchor="end" className="chart-tick">
+              {tick}%
+            </text>
+          </g>
+        ))}
+        {xTicks.map((tick) => (
+          <text
+            key={`x-${tick}`}
+            x={x(tick)}
+            y={HEIGHT - 18}
+            textAnchor="middle"
+            className="chart-tick"
+          >
+            {tick}
+          </text>
+        ))}
+        <text
+          x={PAD.left + innerW / 2}
+          y={HEIGHT - 2}
+          textAnchor="middle"
+          className="chart-axis-label"
+        >
+          Trading days from record close
+        </text>
+
+        {ordered.map((s) => {
+          if (s.points.length < 2) return null;
+          const d = s.points
+            .map((p, i) => `${i === 0 ? "M" : "L"}${x(p.day).toFixed(1)},${y(p.pct).toFixed(1)}`)
+            .join(" ");
+          const last = s.points[s.points.length - 1];
+          return (
+            <g key={s.id}>
+              <path
+                d={d}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={s.open ? 2.75 : 1.35}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={s.open ? 1 : 0.78}
+                className={s.open ? "chart-line chart-line--current" : "chart-line"}
+              />
+              <circle
+                cx={x(last.day)}
+                cy={y(last.pct)}
+                r={s.open ? 3.5 : 2.4}
+                fill={s.color}
+              />
+              <text
+                x={x(last.day) + 8}
+                y={y(last.pct) + 4}
+                className={s.open ? "chart-end-label chart-end-label--current" : "chart-end-label"}
+                fill={s.color}
+              >
+                {s.label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }

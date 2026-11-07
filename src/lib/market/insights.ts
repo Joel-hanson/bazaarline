@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import {
   buildComparisonRows,
   buildDepthDots,
@@ -6,9 +7,9 @@ import {
   buildRecoveryRows,
   tradingDaysBetween,
 } from "./analysis";
+import { FALLBACK_SERIES } from "./fallback";
 import type { InsightsPayload, PricePoint } from "./types";
 import { fetchYahooDaily, type YahooSymbol } from "./yahoo";
-import { FALLBACK_SERIES } from "./fallback";
 
 const SYMBOLS: YahooSymbol[] = ["^NSEI", "^BSESN", "^NSEBANK", "^CNXIT"];
 
@@ -73,7 +74,7 @@ function assemble(
   };
 }
 
-export async function getInsights(): Promise<InsightsPayload> {
+async function computeInsights(): Promise<InsightsPayload> {
   try {
     const live = await loadLive();
     return assemble(live.series, "live");
@@ -82,3 +83,9 @@ export async function getInsights(): Promise<InsightsPayload> {
     return assemble(FALLBACK_SERIES, "fallback");
   }
 }
+
+/** Hourly cache — avoids refetching four Yahoo histories on every request. */
+export const getInsights = unstable_cache(computeInsights, ["bazaarline-insights"], {
+  revalidate: 3600,
+  tags: ["insights"],
+});
