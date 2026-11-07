@@ -1,9 +1,4 @@
-import {
-  formatDateLong,
-  formatLevel,
-  formatPct,
-  formatRecovery,
-} from "@/lib/market/labels";
+import { formatDateLong, formatPct } from "@/lib/market/labels";
 import type { FallEpisode } from "@/lib/market/types";
 import {
   Table,
@@ -13,6 +8,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+function backAtRecord(f: FallEpisode): string {
+  if (f.open) return "Not yet";
+  if (!f.recoveredDate || f.yearsToRecover == null) return "—";
+  const years = f.yearsToRecover;
+  let duration: string;
+  if (years < 1) {
+    const months = Math.max(1, Math.round(years * 12));
+    duration = `${months} month${months === 1 ? "" : "s"}`;
+  } else {
+    duration = `${years.toFixed(1)} years`;
+  }
+  return `${formatDateLong(f.recoveredDate)}, ${duration}`;
+}
 
 export function FallsTable({
   falls,
@@ -51,30 +60,17 @@ export function FallsTable({
                 {f.label}
                 {f.open ? " · so far" : ""}
               </TableCell>
-              <TableCell>
-                {formatDateLong(f.peakDate)}
-                <span className="cell-sub">{formatLevel(f.peak)}</span>
-              </TableCell>
+              <TableCell>{formatDateLong(f.peakDate)}</TableCell>
               <TableCell>
                 {f.open ? "So far" : formatDateLong(f.lowDate)}
-                <span className="cell-sub">{formatLevel(f.low)}</span>
               </TableCell>
               <TableCell className="tabular-nums">
                 {formatPct(f.open ? (f.nowPct ?? f.depthPct) : f.depthPct)}
-                {f.open ? (
-                  <span className="cell-sub">
-                    trough {formatPct(f.depthPct)}
-                  </span>
-                ) : null}
               </TableCell>
-              <TableCell className="tabular-nums">{f.tradingDaysToLow}</TableCell>
-              <TableCell>
-                {f.open
-                  ? formatRecovery(null, true, f.nowPct)
-                  : f.recoveredDate
-                    ? `${formatDateLong(f.recoveredDate)}, ${formatRecovery(f.yearsToRecover, false)}`
-                    : "—"}
+              <TableCell className="tabular-nums">
+                {f.open ? f.tradingDaysToNow : f.tradingDaysToLow}
               </TableCell>
+              <TableCell>{backAtRecord(f)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -12,6 +12,8 @@ export type FallEpisode = {
   low: number;
   depthPct: number;
   tradingDaysToLow: number;
+  /** Peak → latest close (used for open slides in the table, like Kadoa). */
+  tradingDaysToNow: number;
   recoveredDate: string | null;
   yearsToRecover: number | null;
   open: boolean;

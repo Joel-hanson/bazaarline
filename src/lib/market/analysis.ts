@@ -65,6 +65,7 @@ export function findFalls(
       low: trough,
       depthPct,
       tradingDaysToLow: tradingDays,
+      tradingDaysToNow: tradingDays,
       recoveredDate,
       yearsToRecover,
       open: false,
@@ -95,8 +96,10 @@ export function findFalls(
     const depth = trough / peak - 1;
     if (depth <= threshold) {
       const last = points[points.length - 1];
-      let tradingDays = 0;
-      for (let k = peakIdx; k <= troughIdx; k++) tradingDays += 1;
+      let tradingDaysToLow = 0;
+      for (let k = peakIdx; k <= troughIdx; k++) tradingDaysToLow += 1;
+      let tradingDaysToNow = 0;
+      for (let k = peakIdx; k < points.length; k++) tradingDaysToNow += 1;
       const peakDate = points[peakIdx].date;
       const depthPct = Number((depth * 100).toFixed(2));
       const nowPct = Number(((last.close / peak - 1) * 100).toFixed(2));
@@ -108,7 +111,8 @@ export function findFalls(
         lowDate: points[troughIdx].date,
         low: trough,
         depthPct,
-        tradingDaysToLow: tradingDays,
+        tradingDaysToLow,
+        tradingDaysToNow,
         recoveredDate: null,
         yearsToRecover: null,
         open: true,

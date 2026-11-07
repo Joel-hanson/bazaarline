@@ -9,33 +9,35 @@ export function labelFall(peakDate: string, depthPct: number): string {
   if (peakDate >= "2024-08-01" && peakDate <= "2024-11-30") {
     return "2024–25 slide";
   }
-  if (y === "2021" && m >= 9) return "2022 correction";
-  if (y === "2020" || (y === "2019" && m >= 11)) return "Covid crash";
+  if (y === "2021" && m >= 9) return "2022";
+  if (y === "2020" || (y === "2019" && m >= 11)) return "Covid";
   if (y === "2008" || (y === "2007" && m >= 12) || y === "2009") {
-    return "2008 global crisis";
+    return "2008 crisis";
   }
-  if (y === "2010" || y === "2011") return "2011 European crisis";
-  if (y === "2015" || y === "2016") return "2015–16 sell-off";
-  if (y === "2018" && m >= 8) return "2018 IL&FS scare";
-  if (y === "2018" && m <= 3) return "2018 Feb wobble";
-  if (y === "2019") return "2019 mid-cycle dip";
-  if (y === "2022" || y === "2023") return `${y} pullback`;
-  if (y === "2023") return "2023 Oct dip";
+  if (y === "2010" || y === "2011") return "2011";
+  if (y === "2015" || y === "2016") return "2015–16";
+  if (y === "2018" && m >= 8) return "2018 IL&FS";
+  if (y === "2018" && m <= 3) return "2018 Feb";
+  if (y === "2019") return "2019";
+  if (y === "2022" || y === "2023") return `${y}`;
+  if (y === "2023") return "2023";
 
-  if (depthPct <= -40) return `${y} crash`;
-  if (depthPct <= -15) return `${y} correction`;
-  return `${y} slide`;
+  if (depthPct <= -40) return `${y}`;
+  if (depthPct <= -15) return `${y}`;
+  return `${y}`;
 }
 
 export function formatPct(value: number, digits = 1): string {
   const rounded = Number(value.toFixed(digits));
-  const sign = rounded > 0 ? "+" : "";
-  return `${sign}${rounded.toFixed(digits)}%`;
+  // Kadoa-style minus sign for negatives
+  if (rounded < 0) return `−${Math.abs(rounded).toFixed(digits)}%`;
+  if (rounded > 0) return `+${rounded.toFixed(digits)}%`;
+  return `${rounded.toFixed(digits)}%`;
 }
 
 export function formatLevel(value: number): string {
   return new Intl.NumberFormat("en-IN", {
-    maximumFractionDigits: value >= 1000 ? 2 : 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
@@ -50,10 +52,15 @@ export function formatDateLong(iso: string): string {
   }).format(date);
 }
 
-export function formatRecovery(years: number | null, open: boolean, nowPct?: number | null): string {
+export function formatRecovery(
+  years: number | null,
+  open: boolean,
+  nowPct?: number | null,
+): string {
   if (open) {
-    const depth = nowPct != null ? `, ${formatPct(nowPct)}` : "";
-    return `Not yet${depth}`;
+    // Match Kadoa: "Not yet" in the falls table; recovery matrix may add depth
+    if (nowPct != null) return `Not yet: ${formatPct(nowPct)}`;
+    return "Not yet";
   }
   if (years == null) return "—";
   if (years < 1 / 12) return "Under a month";
@@ -61,6 +68,5 @@ export function formatRecovery(years: number | null, open: boolean, nowPct?: num
     const months = Math.max(1, Math.round(years * 12));
     return `${months} month${months === 1 ? "" : "s"}`;
   }
-  if (years < 1.5) return `${years.toFixed(1)} years`;
   return `${years.toFixed(1)} years`;
 }

@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import { Atkinson_Hyperlegible } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
-const manrope = Manrope({
+const atkinson = Atkinson_Hyperlegible({
   variable: "--font-sans",
   subsets: ["latin"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-heading",
-  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -21,10 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${manrope.variable} ${fraunces.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${atkinson.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         <SiteHeader />
         {children}

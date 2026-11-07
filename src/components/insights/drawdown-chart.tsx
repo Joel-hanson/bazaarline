@@ -1,8 +1,8 @@
 import type { OverlaySeries } from "@/lib/market/types";
 
 const WIDTH = 920;
-const HEIGHT = 420;
-const PAD = { top: 28, right: 168, bottom: 48, left: 48 };
+const HEIGHT = 440;
+const PAD = { top: 20, right: 150, bottom: 52, left: 52 };
 
 function downsample(
   points: { day: number; pct: number }[],
@@ -25,11 +25,26 @@ function downsample(
 
 function niceTicks(min: number, max: number, count = 5): number[] {
   const span = max - min || 1;
-  const step = Math.ceil(span / (count - 1) / 5) * 5;
+  const step = Math.ceil(span / (count - 1) / 5) * 5 || 5;
   const start = Math.floor(min / step) * step;
   const ticks: number[] = [];
   for (let v = start; v <= max + 0.01; v += step) ticks.push(v);
   return ticks;
+}
+
+type LabelPos = { id: string; label: string; x: number; y: number; color: string; open: boolean };
+
+function resolveLabelCollisions(labels: LabelPos[], minGap = 14): LabelPos[] {
+  const sorted = [...labels].sort((a, b) => a.y - b.y);
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = sorted[i - 1];
+    const cur = sorted[i];
+    // Only nudge when x positions are close enough to collide visually
+    if (Math.abs(cur.x - prev.x) < 120 && cur.y - prev.y < minGap) {
+      cur.y = prev.y + minGap;
+    }
+  }
+  return sorted;
 }
 
 export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
@@ -49,13 +64,37 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
     PAD.top + ((maxPct - pct) / (maxPct - minPct)) * innerH;
 
   const yTicks = niceTicks(minPct, maxPct, 6);
-  const xTicks = [0, Math.round(maxDay / 4), Math.round(maxDay / 2), Math.round((3 * maxDay) / 4), maxDay];
+  const xTicks = [
+    0,
+    Math.round(maxDay / 4),
+    Math.round(maxDay / 2),
+    Math.round((3 * maxDay) / 4),
+    maxDay,
+  ];
 
-  // Draw historical first, current last (on top)
   const ordered = [
     ...series.filter((s) => !s.open),
     ...series.filter((s) => s.open),
   ];
+
+  const rawLabels: LabelPos[] = ordered
+    .filter((s) => s.points.length >= 2)
+    .map((s) => {
+      // Label at trough for closed crashes; at latest point for the open slide
+      const anchor = s.open
+        ? s.points[s.points.length - 1]
+        : s.points.reduce((m, p) => (p.pct < m.pct ? p : m), s.points[0]);
+      return {
+        id: s.id,
+        label: s.label,
+        x: x(anchor.day) + 8,
+        y: y(anchor.pct) + 4,
+        color: s.color,
+        open: s.open,
+      };
+    });
+
+  const labels = resolveLabelCollisions(rawLabels);
 
   return (
     <div className="chart-frame chart-frame--bleed">
@@ -65,7 +104,6 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
         role="img"
         aria-label="Nifty 50 drawdowns from record closes, compared across crashes"
       >
-        {/* grid */}
         {yTicks.map((tick) => (
           <g key={`y-${tick}`}>
             <line
@@ -75,7 +113,12 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
               y2={y(tick)}
               className={tick === 0 ? "chart-axis" : "chart-grid"}
             />
-            <text x={PAD.left - 10} y={y(tick) + 4} textAnchor="end" className="chart-tick">
+            <text
+              x={PAD.left - 10}
+              y={y(tick) + 4}
+              textAnchor="end"
+              className="chart-tick"
+            >
               {tick}%
             </text>
           </g>
@@ -84,7 +127,7 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
           <text
             key={`x-${tick}`}
             x={x(tick)}
-            y={HEIGHT - 18}
+            y={HEIGHT - 22}
             textAnchor="middle"
             className="chart-tick"
           >
@@ -93,7 +136,7 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
         ))}
         <text
           x={PAD.left + innerW / 2}
-          y={HEIGHT - 2}
+          y={HEIGHT - 4}
           textAnchor="middle"
           className="chart-axis-label"
         >
@@ -103,7 +146,10 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
         {ordered.map((s) => {
           if (s.points.length < 2) return null;
           const d = s.points
-            .map((p, i) => `${i === 0 ? "M" : "L"}${x(p.day).toFixed(1)},${y(p.pct).toFixed(1)}`)
+            .map(
+              (p, i) =>
+                `${i === 0 ? "M" : "L"}${x(p.day).toFixed(1)},${y(p.pct).toFixed(1)}`,
+            )
             .join(" ");
           const last = s.points[s.points.length - 1];
           return (
@@ -112,29 +158,36 @@ export function DrawdownChart({ overlays }: { overlays: OverlaySeries[] }) {
                 d={d}
                 fill="none"
                 stroke={s.color}
-                strokeWidth={s.open ? 2.75 : 1.35}
+                strokeWidth={s.open ? 2.6 : 1.25}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                opacity={s.open ? 1 : 0.78}
-                className={s.open ? "chart-line chart-line--current" : "chart-line"}
+                opacity={s.open ? 1 : 0.75}
               />
               <circle
                 cx={x(last.day)}
                 cy={y(last.pct)}
-                r={s.open ? 3.5 : 2.4}
+                r={s.open ? 3.2 : 2.2}
                 fill={s.color}
               />
-              <text
-                x={x(last.day) + 8}
-                y={y(last.pct) + 4}
-                className={s.open ? "chart-end-label chart-end-label--current" : "chart-end-label"}
-                fill={s.color}
-              >
-                {s.label}
-              </text>
             </g>
           );
         })}
+
+        {labels.map((l) => (
+          <text
+            key={`label-${l.id}`}
+            x={l.x}
+            y={l.y}
+            className={
+              l.open
+                ? "chart-end-label chart-end-label--current"
+                : "chart-end-label"
+            }
+            fill={l.color}
+          >
+            {l.label}
+          </text>
+        ))}
       </svg>
     </div>
   );

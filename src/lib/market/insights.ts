@@ -85,7 +85,11 @@ async function computeInsights(): Promise<InsightsPayload> {
 }
 
 /** Hourly cache — avoids refetching four Yahoo histories on every request. */
-export const getInsights = unstable_cache(computeInsights, ["bazaarline-insights"], {
-  revalidate: 3600,
-  tags: ["insights"],
-});
+export const getInsights = unstable_cache(
+  computeInsights,
+  ["bazaarline-insights-v2"],
+  {
+    revalidate: 3600,
+    tags: ["insights"],
+  },
+);
