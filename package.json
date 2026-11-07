@@ -6,7 +6,8 @@
     "dev": "next dev --port 3847",
     "build": "next build",
     "start": "next start --port 3847",
-    "lint": "eslint"
+    "lint": "eslint",
+    "update-data": "node scripts/update-market-data.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

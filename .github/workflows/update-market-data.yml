@@ -1,0 +1,51 @@
+name: Update market data
+
+on:
+  schedule:
+    # Mondays 02:30 UTC ≈ 08:00 IST — after a typical NSE week settles
+    - cron: "30 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-market-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Refresh Yahoo Finance snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch and write market snapshots
+        run: npm run update-data
+
+      - name: Commit and push if changed
+        env:
+          GIT_AUTHOR_NAME: bazaarline-bot
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: bazaarline-bot
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          git add src/lib/market/data/*.json
+          if git diff --staged --quiet; then
+            echo "No market data changes."
+            exit 0
+          fi
+          git commit -m "chore: weekly India market data refresh"
+          git push

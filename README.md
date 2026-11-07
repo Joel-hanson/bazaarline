@@ -28,11 +28,23 @@ npm run build
 npm start
 ```
 
+## Market data refresh
+
+Snapshots under `src/lib/market/data/` back the offline fallback. Refresh them anytime:
+
+```bash
+npm run update-data
+```
+
+### GitHub Actions (weekly)
+
+`.github/workflows/update-market-data.yml` runs every Monday at 02:30 UTC (`workflow_dispatch` also works). It fetches Yahoo closes, commits any changes to the snapshot JSON, and pushes to `main`.
+
 ## Data notes
 
 - Sources: Yahoo Finance chart API for `^NSEI`, `^BSESN`, `^NSEBANK`, `^CNXIT`
 - Price indices only (no dividends)
 - A “fall” is measured from a record close to the next record; depth is the lowest close in between
-- Pages and the API revalidate about every hour
+- Live pages revalidate about every hour; weekly Actions keep the committed fallback current
 
 Not investment advice.
